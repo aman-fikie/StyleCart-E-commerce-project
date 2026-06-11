@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import '../styles/Home.css';
+import "../styles/Home.css";
+import { useNavigate } from "react-router-dom";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const USD_TO_ETB = 55;
@@ -160,6 +161,7 @@ function SkeletonGrid() {
 
 // ─── Main Home component ──────────────────────────────────────────────────────
 export default function Home() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -283,13 +285,19 @@ export default function Home() {
             </div>
 
             {/* Cart */}
-            <button className="cart-btn">
+            <div className="cart-wrap">
+              <button className="cart-btn">
               <span className="cart-icon">🛍️</span>
+              <span className="logo-style">MyCart</span>
               {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </button>
 
+            </div>
+        
+            
+
             {/* Login */}
-            <button className="login-btn">Login</button>
+            <button className="login-btn" onClick={() => navigate("/login")}>Login</button>
 
             {/* Theme toggle — topmost right */}
             <button
