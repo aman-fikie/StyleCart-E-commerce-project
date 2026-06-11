@@ -227,15 +227,52 @@ export default function Home() {
     }
     setFiltered(result);
   }, [activeCategory, products, searchQuery]);
+  // ==================== CART HELPERS (localStorage) ====================
+const CART_KEY = 'stylecart_cart';
+
+const getCart = () => {
+  const stored = localStorage.getItem(CART_KEY);
+  return stored ? JSON.parse(stored) : [];
+};
+
+const saveCart = (cart) => {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+};
+
+const addToCart = (product, quantity = 1) => {
+  let cart = getCart();
+  const existingIndex = cart.findIndex(item => item.id === product.id);
+  if (existingIndex >= 0) {
+    cart[existingIndex].quantity += quantity;
+  } else {
+    cart.push({
+      id: product.id,
+      title: product.title,
+      price_etb: product.price_etb,
+      image: product.image,
+      quantity: quantity,
+    });
+  }
+  saveCart(cart);
+  return getCartTotalItems();
+};
+
+const getCartTotalItems = () => {
+  const cart = getCart();
+  return cart.reduce((sum, item) => sum + item.quantity, 0);
+};
+// ======================================================================
 
   // ── Add to cart ──
-  const handleAddToCart = useCallback((product) => {
-    setCartCount((c) => c + 1);
-    const id = Date.now();
-    const short = product.title.length > 30 ? product.title.slice(0, 30) + "…" : product.title;
-    setToasts((prev) => [...prev, { id, message: `${short} added to cart` }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
-  }, []);
+ const handleAddToCart = useCallback((product) => {
+  const newTotal = addToCart(product, 1);
+  setCartCount(newTotal);
+
+  const id = Date.now();
+  const short = product.title.length > 30 ? product.title.slice(0, 30) + "…" : product.title;
+  setToasts((prev) => [...prev, { id, message: `${short} added to cart` }]);
+  setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
+}, []);
 
   // ── Category counts ──
   const counts = {
@@ -244,6 +281,7 @@ export default function Home() {
     women: products.filter((p) => p.category === "women").length,
     accessories: products.filter((p) => p.category === "accessories").length,
   };
+  
 
   return (
     <div className="app">
@@ -286,11 +324,15 @@ export default function Home() {
 
             {/* Cart */}
             <div className="cart-wrap">
-              <button className="cart-btn">
-              <span className="cart-icon">🛍️</span>
-              <span className="logo-style">MyCart</span>
-              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-            </button>
+              <button className="cart-btn" onClick={() => navigate("/cart")}>
+  <span className="cart-icon">🛒</span>
+  <span className="logo-style">MyCart</span>
+  {cartCount > 0 && (
+    <span key={cartCount} className="cart-badge">
+      {cartCount}
+    </span>
+  )}
+</button>
 
             </div>
         
