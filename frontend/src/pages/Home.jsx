@@ -265,6 +265,8 @@ const getCartTotalItems = () => {
 
   // ── Add to cart ──
  const handleAddToCart = useCallback((product) => {
+  // ✅ REMOVED: token check – backend will handle auth
+  // Just add to localStorage cart directly
   const newTotal = addToCart(product, 1);
   setCartCount(newTotal);
 
